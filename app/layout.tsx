@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Image2Asset - Image to 3D Asset Pipeline',
+  title: 'I2A - Image to 3D Asset Pipeline',
   description: 'Convert images to 3D assets using AI-powered tools',
 };
 

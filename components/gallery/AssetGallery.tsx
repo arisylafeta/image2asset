@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import {
+  Search,
+  RefreshCw,
+  X,
+  Download,
+  Image as ImageIcon,
+  Box,
+  Wand2,
+  Upload
+} from 'lucide-react';
 import { AssetCard } from './AssetCard';
 
 const ModelViewer = dynamic(
@@ -11,8 +21,8 @@ const ModelViewer = dynamic(
 
 function ModelViewerFallback() {
   return (
-    <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    <div className="w-full h-full bg-gray-800/50 rounded-xl flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
     </div>
   );
 }
@@ -117,71 +127,67 @@ export function AssetGallery({
   };
 
   const typeFilters = [
-    { value: 'all', label: 'All' },
-    { value: 'generated', label: 'Generated' },
-    { value: 'no-bg', label: 'No Background' },
-    { value: 'upload', label: 'Uploaded' },
-    { value: 'model', label: '3D Models' },
+    { value: 'all', label: 'All', icon: ImageIcon },
+    { value: 'generated', label: 'Generated', icon: Wand2 },
+    { value: 'no-bg', label: 'No Background', icon: ImageIcon },
+    { value: 'upload', label: 'Uploaded', icon: Upload },
+    { value: 'model', label: '3D Models', icon: Box },
   ];
 
   return (
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex gap-2">
-          {typeFilters.map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setFilterType(filter.value as AssetType | 'all')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                filterType === filter.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {filter.label}
-            </button>
-          ))}
+        <div className="flex gap-2 flex-wrap">
+          {typeFilters.map((filter) => {
+            const Icon = filter.icon;
+            return (
+              <button
+                key={filter.value}
+                onClick={() => setFilterType(filter.value as AssetType | 'all')}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm font-medium ${
+                  filterType === filter.value
+                    ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
+                    : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-800'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {filter.label}
+              </button>
+            );
+          })}
         </div>
-        <div className="flex-1">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by prompt or filename..."
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          onClick={fetchAssets}
-          className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg hover:bg-gray-700 transition-colors"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        <div className="flex-1 flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by prompt or filename..."
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-800/50 border border-gray-800/60 rounded-xl focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 text-white placeholder-gray-600 transition-all"
             />
-          </svg>
-        </button>
+          </div>
+          <button
+            onClick={fetchAssets}
+            className="p-2.5 bg-gray-800/50 text-gray-400 rounded-xl hover:text-white hover:bg-gray-800 transition-all"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Loading state */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
         </div>
       )}
 
       {/* Error state */}
       {error && (
-        <div className="p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-200">
+        <div className="p-4 bg-red-950/50 border border-red-900/50 rounded-xl text-red-400 flex items-center gap-2">
+          <X className="w-5 h-5" />
           {error}
         </div>
       )}
@@ -189,19 +195,9 @@ export function AssetGallery({
       {/* Empty state */}
       {!loading && !error && assets.length === 0 && (
         <div className="text-center py-12">
-          <svg
-            className="w-16 h-16 mx-auto text-gray-600 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
+          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 flex items-center justify-center ring-1 ring-indigo-500/20">
+            <ImageIcon className="w-10 h-10 text-indigo-500/30" />
+          </div>
           <p className="text-gray-500">No assets found</p>
           <p className="text-gray-600 text-sm mt-1">
             Generate or upload some images to get started
@@ -235,38 +231,27 @@ export function AssetGallery({
       {/* Model Viewer Modal */}
       {viewingModel && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
           onClick={() => setViewingModel(null)}
         >
           <div
-            className="relative w-full max-w-4xl mx-4 bg-gray-900 rounded-lg overflow-hidden"
+            className="relative w-full max-w-4xl mx-4 bg-gray-900 rounded-2xl overflow-hidden ring-1 ring-gray-800"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+            <div className="flex items-center justify-between p-4 border-b border-gray-800/60">
               <div>
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Box className="w-5 h-5 text-indigo-400" />
                   {viewingModel.prompt || '3D Model'}
                 </h3>
                 <p className="text-sm text-gray-500">{viewingModel.path}</p>
               </div>
               <button
                 onClick={() => setViewingModel(null)}
-                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -276,28 +261,16 @@ export function AssetGallery({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between p-4 border-t border-gray-800">
-              <p className="text-sm text-gray-500">
-                Drag to rotate | Scroll to zoom | Right-click to pan
+            <div className="flex items-center justify-between p-4 border-t border-gray-800/60">
+              <p className="text-xs text-gray-500">
+                Drag to rotate · Scroll to zoom · Right-click to pan
               </p>
               <a
                 href={viewingModel.path}
                 download
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all font-medium shadow-lg shadow-emerald-500/25"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
-                </svg>
+                <Download className="w-4 h-4" />
                 Download GLB
               </a>
             </div>

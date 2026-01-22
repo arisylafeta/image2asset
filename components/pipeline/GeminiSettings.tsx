@@ -34,10 +34,10 @@ export function GeminiSettings({ settings, onChange }: GeminiSettingsProps) {
     <div className="space-y-6">
       {/* Aspect Ratio */}
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-medium text-gray-300">Aspect Ratio</label>
           {selectedRatio && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-indigo-400 font-medium bg-indigo-500/10 px-2 py-0.5 rounded-full">
               {selectedRatio.width} x {selectedRatio.height}
             </span>
           )}
@@ -48,18 +48,21 @@ export function GeminiSettings({ settings, onChange }: GeminiSettingsProps) {
               key={ratio.value}
               onClick={() => updateSetting('aspectRatio', ratio.value)}
               className={`
-                flex flex-col items-center justify-center p-3 rounded-lg border transition-all
+                flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all
                 ${settings.aspectRatio === ratio.value
-                  ? 'bg-gray-800 border-gray-600 text-white'
-                  : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
+                  ? 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border-indigo-500/50 text-white ring-1 ring-indigo-500/30'
+                  : 'bg-gray-900/50 border-gray-800/60 text-gray-400 hover:border-gray-700 hover:text-gray-300'
                 }
               `}
               title={`${ratio.label} - ${ratio.width}x${ratio.height}`}
             >
               <div
                 className={`
-                  border-2 mb-1 transition-colors
-                  ${settings.aspectRatio === ratio.value ? 'border-white' : 'border-gray-600'}
+                  border-2 mb-1.5 transition-colors rounded-sm
+                  ${settings.aspectRatio === ratio.value
+                    ? 'border-indigo-400 bg-indigo-400/20'
+                    : 'border-gray-600'
+                  }
                 `}
                 style={{
                   width: '20px',
@@ -68,7 +71,7 @@ export function GeminiSettings({ settings, onChange }: GeminiSettingsProps) {
                   maxWidth: '20px',
                 }}
               />
-              <span className="text-xs">{ratio.value}</span>
+              <span className="text-xs font-medium">{ratio.value}</span>
             </button>
           ))}
         </div>
@@ -76,17 +79,17 @@ export function GeminiSettings({ settings, onChange }: GeminiSettingsProps) {
 
       {/* Response Modality */}
       <div>
-        <label className="text-sm font-medium text-gray-300 block mb-2">
+        <label className="text-sm font-medium text-gray-300 block mb-3">
           Output Type
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 p-1 bg-gray-900/50 rounded-xl ring-1 ring-gray-800/60">
           <button
             onClick={() => updateSetting('responseModalities', 'Image')}
             className={`
-              flex-1 px-4 py-2 rounded-lg border transition-all text-sm
+              flex-1 px-4 py-2.5 rounded-lg transition-all text-sm font-medium
               ${settings.responseModalities === 'Image'
-                ? 'bg-gray-800 border-gray-600 text-white'
-                : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
+                ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
+                : 'text-gray-400 hover:text-white'
               }
             `}
           >
@@ -95,10 +98,10 @@ export function GeminiSettings({ settings, onChange }: GeminiSettingsProps) {
           <button
             onClick={() => updateSetting('responseModalities', 'Text,Image')}
             className={`
-              flex-1 px-4 py-2 rounded-lg border transition-all text-sm
+              flex-1 px-4 py-2.5 rounded-lg transition-all text-sm font-medium
               ${settings.responseModalities === 'Text,Image' || !settings.responseModalities
-                ? 'bg-gray-800 border-gray-600 text-white'
-                : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
+                ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
+                : 'text-gray-400 hover:text-white'
               }
             `}
           >

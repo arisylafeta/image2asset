@@ -1,0 +1,35 @@
+{
+  "name": "image2asset",
+  "version": "1.0.0",
+  "description": "Image to 3D Asset Pipeline using Gemini, Bria, and Trellis",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@google/generative-ai": "^0.21.0",
+    "@fal-ai/client": "^1.0.0",
+    "three": "^0.160.0",
+    "@react-three/fiber": "^8.15.0",
+    "@react-three/drei": "^9.88.0",
+    "zod": "^3.22.0",
+    "uuid": "^9.0.0",
+    "clsx": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/node": "^20.0.0",
+    "@types/three": "^0.160.0",
+    "@types/uuid": "^9.0.0",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0"
+  }
+}

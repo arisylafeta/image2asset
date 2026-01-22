@@ -1,0 +1,51 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Generated assets (keep structure but not files)
+/public/assets/generated/*
+!/public/assets/generated/.gitkeep
+/public/assets/no-bg/*
+!/public/assets/no-bg/.gitkeep
+/public/assets/uploads/*
+!/public/assets/uploads/.gitkeep
+
+# Generated models
+/models/*
+!/models/.gitkeep
+
+# Data files (keep structure but not files)
+/data/assets.json
+/data/jobs.json

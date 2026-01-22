@@ -1,0 +1,24 @@
+{
+  "services": {
+    "gemini": {
+      "model": "gemini-2.0-flash-exp-image-generation",
+      "defaultAspectRatio": "1:1"
+    },
+    "bria": {
+      "preserveAlpha": false
+    },
+    "trellis": {
+      "textureSize": 1024,
+      "meshSimplify": 0.95
+    }
+  },
+  "bulk": {
+    "concurrency": 3,
+    "retryAttempts": 2
+  },
+  "storage": {
+    "modelsDir": "./public/models",
+    "dataDir": "./data",
+    "assetsDir": "./public/assets"
+  }
+}

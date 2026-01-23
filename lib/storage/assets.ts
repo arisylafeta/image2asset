@@ -105,7 +105,16 @@ export async function saveAsset(
   const filename = options.filename || generateAssetFilename(type, options.prompt);
   const filePath = join(dir, filename);
 
-  const buffer = typeof data === 'string' ? Buffer.from(data, 'base64') : data;
+  // Strip data URI prefix if present (e.g., "data:image/png;base64,")
+  let dataToSave = data;
+  if (typeof data === 'string' && data.startsWith('data:')) {
+    const commaIndex = data.indexOf(',');
+    if (commaIndex !== -1) {
+      dataToSave = data.substring(commaIndex + 1);
+    }
+  }
+
+  const buffer = typeof dataToSave === 'string' ? Buffer.from(dataToSave, 'base64') : dataToSave;
   writeFileSync(filePath, buffer);
 
   const publicPath = getPublicAssetPath(type, filename);

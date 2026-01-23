@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const GeminiConfigSchema = z.object({
-  model: z.string().default('gemini-2.0-flash-exp-image-generation'),
+  model: z.string().default('gemini-2.5-flash-image'),
   defaultAspectRatio: z.string().default('1:1'),
 });
 

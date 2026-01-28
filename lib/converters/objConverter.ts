@@ -1,3 +1,9 @@
+/**
+ * @deprecated Use gltfTransformConverter for server-side conversion instead.
+ * This client-side converter has quality issues with PBR materials and
+ * does not export metalness/roughness maps properly.
+ */
+
 import * as THREE from 'three';
 import { OBJExporter } from 'three-stdlib';
 import { GLTFLoader } from 'three-stdlib';

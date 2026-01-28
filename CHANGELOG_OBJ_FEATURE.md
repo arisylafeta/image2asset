@@ -212,6 +212,27 @@ If issues arise with OBJ conversion:
    - Check for warnings about texture extraction failures
    - Verify no errors during conversion
 
+## Migration to Server-Side Conversion (January 2026)
+
+### Why?
+- Client-side Three.js OBJExporter lacks proper PBR material support
+- Missing metalness/roughness maps in MTL output
+- Quality inferior to professional converters
+
+### Solution
+- Migrated to @gltf-transform server-side conversion
+- API endpoint: /api/convert-obj
+- Proper PBR material export with all texture maps
+
+### Benefits
+- ✅ Higher quality OBJ/MTL output
+- ✅ Proper metalness/roughness maps
+- ✅ No browser memory limits
+- ✅ Works in all 3D viewers
+
+### Legacy Code
+- `lib/converters/objConverter.ts` - Deprecated, kept for reference
+
 ## Contact/Context
 
 - **Project**: Image2Asset - Next.js 14 web app for image to 3D conversion

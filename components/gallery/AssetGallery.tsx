@@ -143,15 +143,27 @@ export function AssetGallery({
       const { blob, filename } = await convertGLBtoOBJ(asset.path, handleProgress);
 
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${filename}_obj.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      try {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}_obj.zip`;
+        document.body.appendChild(link);
+        link.click();
+      } finally {
+        URL.revokeObjectURL(url);
+        const link = document.querySelector('a[href="' + url + '"]');
+        if (link) document.body.removeChild(link);
+      }
     } catch (error) {
-      setConversionError(error as ConversionError);
+      if (error && typeof error === 'object' && 'type' in error && 'message' in error) {
+        setConversionError(error as ConversionError);
+      } else {
+        setConversionError({
+          type: 'export',
+          message: error instanceof Error ? error.message : 'An unknown error occurred',
+          details: error instanceof Error ? error.stack : undefined
+        });
+      }
     } finally {
       setConverting(false);
       setConversionProgress({ stage: '', progress: 0 });

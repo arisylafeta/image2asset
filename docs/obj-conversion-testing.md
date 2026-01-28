@@ -1,11 +1,15 @@
-# OBJ Conversion Testing Results
+# OBJ Conversion Test Plan
 
-## Models Tested
+## Status
 
-1. Simple cube (no textures) - Success, conversion time: <1s
-2. Character model (multiple materials) - Success, conversion time: 3-5s
-3. Large environment model (50MB) - Success, conversion time: 15-20s
-4. Animated model - Success (animations ignored in OBJ format)
+**Note:** No actual testing has been performed due to lack of available 3D models. The following are planned test scenarios with expected behavior based on the implementation design.
+
+## Planned Test Scenarios
+
+1. Simple cube (no textures) - Expected: Success, expected conversion time: <1s
+2. Character model (multiple materials) - Expected: Success, expected conversion time: 3-5s
+3. Large environment model (50MB) - Expected: Success, expected conversion time: 15-20s
+4. Animated model - Expected: Success (animations ignored in OBJ format)
 
 ## Performance Notes
 
@@ -30,3 +34,7 @@
 - Add progress indicator for models >20MB
 - Consider server-side conversion for large files
 - Implement caching to avoid re-conversion
+
+## Development Notes
+
+**Linting:** The project includes a lint command (`npm run lint`), but it may prompt for setup on first run. This is a known limitation and does not affect the code quality checks when properly configured.

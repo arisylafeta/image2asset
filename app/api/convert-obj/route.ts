@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const baseName = modelId.replace(/\.glb$/i, '');
 
     zip.file(`${baseName}.obj`, obj);
-    zip.file(`${baseName}.mtl`, mtl);
+    zip.file('model.mtl', mtl);
 
     // Convert Map entries to array to avoid downlevelIteration requirement
     Array.from(textures.entries()).forEach(([name, { data }]) => {

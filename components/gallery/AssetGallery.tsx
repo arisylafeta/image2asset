@@ -136,8 +136,8 @@ export function AssetGallery({
     setConversionProgress({ stage: 'Preparing conversion...', progress: 0 });
 
     try {
-      // Extract model ID from path (e.g., /models/model-123.glb -> model-123)
-      const modelId = asset.path.split('/').pop()?.replace('.glb', '') || asset.id;
+      // Extract model filename from path (e.g., /models/model-123.glb -> model-123.glb)
+      const modelId = asset.path.split('/').pop() || asset.id;
 
       setConversionProgress({ stage: 'Converting to OBJ...', progress: 50 });
 
@@ -160,7 +160,7 @@ export function AssetGallery({
       try {
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${modelId}_obj.zip`;
+        link.download = `${modelId.replace('.glb', '')}_obj.zip`;
         document.body.appendChild(link);
         link.click();
       } finally {

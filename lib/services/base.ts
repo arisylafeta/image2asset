@@ -97,35 +97,29 @@ export interface RemoveBackgroundResponse {
 }
 
 export interface TrellisSettings {
-  // Resolution
-  resolution?: number; // Default: 1024
-
-  // Sparse Structure settings
-  ss_guidance_strength?: number; // Default: 7.5, Range: 0-10
-  ss_guidance_rescale?: number; // Default: 0.7
-  ss_sampling_steps?: number; // Default: 12, Range: 1-50
-  ss_rescale_t?: number; // Default: 5
-
-  // Shape SLAT settings
-  shape_slat_guidance_strength?: number; // Default: 7.5
-  shape_slat_guidance_rescale?: number; // Default: 0.5
-  shape_slat_sampling_steps?: number; // Default: 12
-  shape_slat_rescale_t?: number; // Default: 3
-
-  // Texture SLAT settings
-  tex_slat_guidance_strength?: number; // Default: 1
-  tex_slat_sampling_steps?: number; // Default: 12
-  tex_slat_rescale_t?: number; // Default: 3
-
-  // Mesh settings
-  decimation_target?: number; // Default: 500000
-  texture_size?: number; // Default: 2048
-  remesh?: boolean; // Default: true
-  remesh_band?: number; // Default: 1
+  resolution?: number;
+  seed?: number;
+  decimation_target?: number;
+  texture_size?: number;
+  ss_guidance_strength?: number;
+  ss_guidance_rescale?: number;
+  ss_sampling_steps?: number;
+  ss_rescale_t?: number;
+  shape_slat_guidance_strength?: number;
+  shape_slat_guidance_rescale?: number;
+  shape_slat_sampling_steps?: number;
+  shape_slat_rescale_t?: number;
+  tex_slat_guidance_strength?: number;
+  tex_slat_sampling_steps?: number;
+  tex_slat_rescale_t?: number;
+  remesh?: boolean;
+  remesh_band?: number;
+  remesh_project?: number;
 }
 
 export interface Convert3DRequest {
-  imageUrl: string;
+  imageUrl?: string;
+  imageUrls?: string[];
   settings?: TrellisSettings;
 }
 

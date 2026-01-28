@@ -9,15 +9,9 @@ export const BriaConfigSchema = z.object({
   preserveAlpha: z.boolean().default(false),
 });
 
-export const TrellisConfigSchema = z.object({
-  textureSize: z.number().default(1024),
-  meshSimplify: z.number().min(0).max(1).default(0.95),
-});
-
 export const ServicesConfigSchema = z.object({
   gemini: GeminiConfigSchema.default({}),
   bria: BriaConfigSchema.default({}),
-  trellis: TrellisConfigSchema.default({}),
 });
 
 export const BulkConfigSchema = z.object({
@@ -39,7 +33,6 @@ export const ConfigSchema = z.object({
 
 export type GeminiConfig = z.infer<typeof GeminiConfigSchema>;
 export type BriaConfig = z.infer<typeof BriaConfigSchema>;
-export type TrellisConfig = z.infer<typeof TrellisConfigSchema>;
 export type ServicesConfig = z.infer<typeof ServicesConfigSchema>;
 export type BulkConfig = z.infer<typeof BulkConfigSchema>;
 export type StorageConfig = z.infer<typeof StorageConfigSchema>;

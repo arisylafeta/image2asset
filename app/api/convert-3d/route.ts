@@ -8,14 +8,16 @@ import { TrellisSettings } from '@/lib/services/base';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { imageUrl, assetId, settings } = body as {
+    const { imageUrls, imageUrl, assetId, settings } = body as {
+      imageUrls?: string[];
       imageUrl?: string;
       assetId?: string;
       settings?: TrellisSettings;
     };
 
-    let sourceUrl: string;
-    let sourceAssetId: string | undefined;
+    // Support multiple input methods
+    let sourceUrls: string[] = [];
+    let sourceAssetIds: string[] = [];
 
     if (assetId) {
       const asset = getAsset(assetId);
@@ -25,27 +27,31 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
-      sourceUrl = `${getBaseUrl()}${asset.path}`;
-      sourceAssetId = asset.id;
+      sourceUrls = [`${getBaseUrl()}${asset.path}`];
+      sourceAssetIds = [asset.id];
+    } else if (imageUrls && imageUrls.length > 0) {
+      sourceUrls = imageUrls;
+      sourceAssetIds = [];
     } else if (imageUrl) {
-      sourceUrl = imageUrl;
+      sourceUrls = [imageUrl];
+      sourceAssetIds = [];
     } else {
       return NextResponse.json(
-        { error: 'Either imageUrl or assetId is required' },
+        { error: 'Either imageUrls, imageUrl, or assetId is required' },
         { status: 400 }
       );
     }
 
     const job = createJob('convert-3d', {
-      imageUrl: sourceUrl,
-      assetId: sourceAssetId,
+      imageUrls: sourceUrls,
+      assetIds: sourceAssetIds,
       settings: settings as Record<string, unknown>,
     });
 
     updateJob(job.id, { status: 'processing', progress: 10, message: 'Starting 3D conversion...' });
 
     const result = await trellisService.convertTo3D(
-      { imageUrl: sourceUrl, settings },
+      { imageUrls: sourceUrls, settings },
       (progress, message) => {
         updateJob(job.id, { progress, message });
       }
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     const modelAsset = await saveModel(result.data.modelUrl, {
-      sourceAssetId,
+      sourceAssetId: sourceAssetIds[0],
     });
 
     updateJob(job.id, {

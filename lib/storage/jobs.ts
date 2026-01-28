@@ -9,7 +9,9 @@ export type JobType = 'generate' | 'remove-bg' | 'convert-3d' | 'pipeline' | 'bu
 export interface JobInput {
   prompt?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   assetId?: string;
+  assetIds?: string[];
   options?: Record<string, unknown>;
   settings?: Record<string, unknown>;
 }

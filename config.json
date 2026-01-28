@@ -6,10 +6,6 @@
     },
     "bria": {
       "preserveAlpha": false
-    },
-    "trellis": {
-      "textureSize": 1024,
-      "meshSimplify": 0.95
     }
   },
   "bulk": {

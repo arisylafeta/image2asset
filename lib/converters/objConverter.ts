@@ -3,6 +3,17 @@ import { OBJExporter } from 'three-stdlib';
 import { GLTFLoader } from 'three-stdlib';
 import JSZip from 'jszip';
 
+// TODO: Consider implementing server-side conversion for better performance
+// - Create API endpoint: /api/convert-obj
+// - Use Node.js Three.js for conversion
+// - Benefits: Faster for large models, no browser memory limits
+// Trade-offs: Server load, implementation complexity
+
+// TODO: Evaluate CLI tools for potential performance gains
+// - glTF-Transform CLI (https://gltf-transform.donmccurdy.com/cli/obj)
+// - FBX2OBJ converters
+// - Compare conversion speed and quality with current Three.js implementation
+
 export interface ConvertedModel {
   obj: string;
   mtl?: string;

@@ -170,6 +170,11 @@ export function AssetGallery({
     }
   };
 
+  // TODO: Add cache for converted OBJ files to avoid re-conversion
+  // - Store converted ZIPs in /models/obj-cache/
+  // - Check cache before conversion
+  // - Implement cache invalidation strategy
+
   const typeFilters = [
     { value: 'all', label: 'All', icon: ImageIcon },
     { value: 'generated', label: 'Generated', icon: Wand2 },

@@ -88,8 +88,8 @@ async function extractMaterialsAndTextures(
           const matName = `Material_${materialIndex++}`;
           mtlContent += `newmtl ${matName}\n`;
 
-          mtlContent += `Ka ${material.color?.r || 1} ${material.color?.g || 1} ${material.color?.b || 1}\n`;
-          mtlContent += `Kd ${material.color?.r || 1} ${material.color?.g || 1} ${material.color?.b || 1}\n`;
+          mtlContent += `Ka ${material.color?.r ?? 1} ${material.color?.g ?? 1} ${material.color?.b ?? 1}\n`;
+          mtlContent += `Kd ${material.color?.r ?? 1} ${material.color?.g ?? 1} ${material.color?.b ?? 1}\n`;
           mtlContent += `Ks ${0.5} ${0.5} ${0.5}\n`;
           mtlContent += `Ns 32\n`;
           mtlContent += `d ${material.opacity || 1}\n`;
@@ -126,6 +126,8 @@ async function extractMaterialsAndTextures(
 }
 
 function extractTextureData(texture: THREE.Texture): string {
+  if (!texture.image) return '';
+  
   try {
     const canvas = document.createElement('canvas');
     canvas.width = texture.image.width;
@@ -193,7 +195,8 @@ export async function convertGLBtoOBJ(
     onProgress?.('Conversion complete', 100);
     return { blob, filename: modelName.replace(/\.glb$/i, '') };
   } catch (error) {
-    if (error && typeof error === 'object' && 'type' in error && 'message' in error) {
+    if (error && typeof error === 'object' && 'type' in error && 
+        'message' in error && ['load', 'parse', 'export', 'zip'].includes((error as ConversionError).type)) {
       throw error;
     }
     throw error instanceof Error ? {

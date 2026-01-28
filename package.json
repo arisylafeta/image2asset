@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@fal-ai/client": "^1.0.0",
+    "@gltf-transform/core": "^3.5.0",
+    "@gltf-transform/extensions": "^3.5.0",
+    "@gltf-transform/functions": "^3.5.0",
     "@google/generative-ai": "^0.21.0",
     "@react-three/drei": "^9.88.0",
     "@react-three/fiber": "^8.15.0",

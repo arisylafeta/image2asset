@@ -72,59 +72,89 @@ async function extractMaterialsAndTextures(
   onProgress?: ConversionProgress
 ): Promise<{ mtl: string; textures: Map<string, { name: string; data: string }> }> {
   onProgress?.('Extracting materials and textures', 0);
-
+  
   const textures = new Map<string, { name: string; data: string }>();
+  const materialMap = new Map<string, string>(); // Material key -> Material name
   let mtlContent = '';
   let materialIndex = 0;
   let totalMaterials = 0;
-
+  
   scene.traverse((object) => {
     if (object instanceof THREE.Mesh && object.material) {
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       totalMaterials += materials.length;
     }
   });
-
+  
   let processedMaterials = 0;
-
+  
   scene.traverse((object) => {
     if (object instanceof THREE.Mesh && object.material) {
       const materials = Array.isArray(object.material) ? object.material : [object.material];
-
+      
       materials.forEach((material) => {
         if (material instanceof THREE.MeshStandardMaterial ||
             material instanceof THREE.MeshBasicMaterial ||
             material instanceof THREE.MeshPhongMaterial) {
+          
+          // Create a unique key for material deduplication based on properties
+          const matKey = [
+            material.color?.r ?? 1,
+            material.color?.g ?? 1,
+            material.color?.b ?? 1,
+            material.opacity ?? 1,
+            material.map?.uuid ?? 'none',
+            ('normalMap' in material && material.normalMap instanceof THREE.Texture) ? material.normalMap.uuid : 'none',
+          ].join('|');
+          
+          // Check if we've seen this material before
+          let matName = materialMap.get(matKey);
+          if (!matName) {
+            matName = `Material_${materialIndex++}`;
+            materialMap.set(matKey, matName);
+            mtlContent += `newmtl ${matName}\n`;
 
-          const matName = `Material_${materialIndex++}`;
-          mtlContent += `newmtl ${matName}\n`;
+            mtlContent += `Ka ${material.color?.r ?? 1} ${material.color?.g ?? 1} ${material.color?.b ?? 1}\n`;
+            mtlContent += `Kd ${material.color?.r ?? 1} ${material.color?.g ?? 1} ${material.color?.b ?? 1}\n`;
+            mtlContent += `Ks ${0.5} ${0.5} ${0.5}\n`;
+            mtlContent += `Ns 32\n`;
+            mtlContent += `d ${material.opacity || 1}\n`;
+            mtlContent += `illum 2\n`;
+          }
 
-          mtlContent += `Ka ${material.color?.r ?? 1} ${material.color?.g ?? 1} ${material.color?.b ?? 1}\n`;
-          mtlContent += `Kd ${material.color?.r ?? 1} ${material.color?.g ?? 1} ${material.color?.b ?? 1}\n`;
-          mtlContent += `Ks ${0.5} ${0.5} ${0.5}\n`;
-          mtlContent += `Ns 32\n`;
-          mtlContent += `d ${material.opacity || 1}\n`;
-          mtlContent += `illum 2\n`;
-
+          // Extract textures for this material (even if reusing material definition)
           if (material.map instanceof THREE.Texture && material.map.image) {
             const textureName = `texture_${matName}.png`;
-            textures.set(textureName, {
-              name: textureName,
-              data: extractTextureData(material.map)
-            });
+            // Only add texture to map if not already present
+            if (!textures.has(textureName)) {
+              textures.set(textureName, {
+                name: textureName,
+                data: extractTextureData(material.map)
+              });
+            }
+            // Always add map_Kd line to MTL for material reference
             mtlContent += `map_Kd ${textureName}\n`;
           }
 
           if ('normalMap' in material && material.normalMap instanceof THREE.Texture && material.normalMap.image) {
             const normalName = `normal_${matName}.png`;
-            textures.set(normalName, {
-              name: normalName,
-              data: extractTextureData(material.normalMap)
-            });
+            // Only add normal map to map if not already present
+            if (!textures.has(normalName)) {
+              textures.set(normalName, {
+                name: normalName,
+                data: extractTextureData(material.normalMap)
+              });
+            }
+            // Always add map_Bump line to MTL for material reference
             mtlContent += `map_Bump ${normalName}\n`;
           }
 
-          mtlContent += '\n';
+          // Only add newline and increment for new materials
+          if (!matName) {
+            mtlContent += '\n';
+            materialIndex++;
+          }
+
           processedMaterials++;
           onProgress?.('Extracting materials and textures', (processedMaterials / totalMaterials) * 100);
         }

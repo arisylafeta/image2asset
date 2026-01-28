@@ -35,8 +35,10 @@ export async function convertGLBtoOBJ(
       .registerExtensions(ALL_EXTENSIONS);
 
     // Try to register draco dependencies if available
+    // Using dynamic import with variable to prevent webpack from bundling
     try {
-      const draco = await import('draco3dgltf');
+      const dracoModule = 'draco3dgltf';
+      const draco = await import(/* webpackIgnore: true */ dracoModule);
       io.registerDependencies({
         'draco3d.decoder': draco,
         'draco3d.encoder': draco

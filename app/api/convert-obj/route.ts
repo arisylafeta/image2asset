@@ -35,14 +35,15 @@ export async function POST(request: NextRequest) {
     zip.file(`${baseName}.obj`, obj);
     zip.file(`${baseName}.mtl`, mtl);
 
-    for (const [name, { data }] of textures.entries()) {
+    // Convert Map entries to array to avoid downlevelIteration requirement
+    Array.from(textures.entries()).forEach(([name, { data }]) => {
       zip.file(name, data);
-    }
+    });
 
     const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
 
-    // Return ZIP file
-    return new NextResponse(zipBuffer, {
+    // Return ZIP file - convert Buffer to Uint8Array for NextResponse
+    return new NextResponse(new Uint8Array(zipBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/zip',

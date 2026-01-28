@@ -65,6 +65,16 @@ async function extractMaterialsAndTextures(
   const textures = new Map<string, { name: string; data: string }>();
   let mtlContent = '';
   let materialIndex = 0;
+  let totalMaterials = 0;
+
+  scene.traverse((object) => {
+    if (object instanceof THREE.Mesh && object.material) {
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      totalMaterials += materials.length;
+    }
+  });
+
+  let processedMaterials = 0;
 
   scene.traverse((object) => {
     if (object instanceof THREE.Mesh && object.material) {
@@ -85,7 +95,7 @@ async function extractMaterialsAndTextures(
           mtlContent += `d ${material.opacity || 1}\n`;
           mtlContent += `illum 2\n`;
 
-          if (material.map && material.map.image) {
+          if (material.map instanceof THREE.Texture && material.map.image) {
             const textureName = `texture_${matName}.png`;
             textures.set(textureName, {
               name: textureName,
@@ -94,7 +104,7 @@ async function extractMaterialsAndTextures(
             mtlContent += `map_Kd ${textureName}\n`;
           }
 
-          if ('normalMap' in material && material.normalMap && material.normalMap.image) {
+          if ('normalMap' in material && material.normalMap instanceof THREE.Texture && material.normalMap.image) {
             const normalName = `normal_${matName}.png`;
             textures.set(normalName, {
               name: normalName,
@@ -104,10 +114,10 @@ async function extractMaterialsAndTextures(
           }
 
           mtlContent += '\n';
+          processedMaterials++;
+          onProgress?.('Extracting materials and textures', (processedMaterials / totalMaterials) * 100);
         }
       });
-
-      onProgress?.('Extracting materials and textures', (materialIndex / scene.children.length) * 100);
     }
   });
 
@@ -116,17 +126,23 @@ async function extractMaterialsAndTextures(
 }
 
 function extractTextureData(texture: THREE.Texture): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = texture.image.width;
-  canvas.height = texture.image.height;
-  const ctx = canvas.getContext('2d');
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = texture.image.width;
+    canvas.height = texture.image.height;
+    const ctx = canvas.getContext('2d');
 
-  if (!ctx) {
-    throw new Error('Failed to create canvas context');
+    if (!ctx) {
+      console.warn('Failed to create canvas context for texture');
+      return '';
+    }
+
+    ctx.drawImage(texture.image as HTMLImageElement, 0, 0);
+    return canvas.toDataURL('image/png');
+  } catch (error) {
+    console.warn('Failed to extract texture data:', error instanceof Error ? error.message : 'Unknown error');
+    return '';
   }
-
-  ctx.drawImage(texture.image as HTMLImageElement, 0, 0);
-  return canvas.toDataURL('image/png');
 }
 
 async function createZipFile(
@@ -177,6 +193,9 @@ export async function convertGLBtoOBJ(
     onProgress?.('Conversion complete', 100);
     return { blob, filename: modelName.replace(/\.glb$/i, '') };
   } catch (error) {
+    if (error && typeof error === 'object' && 'type' in error && 'message' in error) {
+      throw error;
+    }
     throw error instanceof Error ? {
       type: 'export',
       message: 'Conversion failed',

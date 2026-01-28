@@ -13,7 +13,6 @@ import {
   Upload,
   FileArchive
 } from 'lucide-react';
-import { convertGLBtoOBJ, ConversionError, ConversionProgress } from '@/lib/converters/objConverter';
 import { AssetCard } from './AssetCard';
 
 const ModelViewer = dynamic(
@@ -67,7 +66,7 @@ export function AssetGallery({
   const [viewingModel, setViewingModel] = useState<Asset | null>(null);
   const [converting, setConverting] = useState(false);
   const [conversionProgress, setConversionProgress] = useState({ stage: '', progress: 0 });
-  const [conversionError, setConversionError] = useState<ConversionError | null>(null);
+  const [conversionError, setConversionError] = useState<{ type: string; message: string; details?: string } | null>(null);
 
   const fetchAssets = async () => {
     setLoading(true);
@@ -134,19 +133,34 @@ export function AssetGallery({
   const handleObjDownload = async (asset: Asset) => {
     setConverting(true);
     setConversionError(null);
-
-    const handleProgress: ConversionProgress = (stage, progress) => {
-      setConversionProgress({ stage, progress });
-    };
+    setConversionProgress({ stage: 'Preparing conversion...', progress: 0 });
 
     try {
-      const { blob, filename } = await convertGLBtoOBJ(asset.path, handleProgress);
+      // Extract model ID from path (e.g., /models/model-123.glb -> model-123)
+      const modelId = asset.path.split('/').pop()?.replace('.glb', '') || asset.id;
 
+      setConversionProgress({ stage: 'Converting to OBJ...', progress: 50 });
+
+      const response = await fetch('/api/convert-obj', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modelId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to convert model');
+      }
+
+      setConversionProgress({ stage: 'Downloading...', progress: 90 });
+
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
+
       try {
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${filename}_obj.zip`;
+        link.download = `${modelId}_obj.zip`;
         document.body.appendChild(link);
         link.click();
       } finally {
@@ -154,9 +168,11 @@ export function AssetGallery({
         const link = document.querySelector('a[href="' + url + '"]');
         if (link) document.body.removeChild(link);
       }
+
+      setConversionProgress({ stage: 'Complete', progress: 100 });
     } catch (error) {
       if (error && typeof error === 'object' && 'type' in error && 'message' in error) {
-        setConversionError(error as ConversionError);
+        setConversionError(error as { type: string; message: string; details?: string });
       } else {
         setConversionError({
           type: 'export',
@@ -166,7 +182,7 @@ export function AssetGallery({
       }
     } finally {
       setConverting(false);
-      setConversionProgress({ stage: '', progress: 0 });
+      setTimeout(() => setConversionProgress({ stage: '', progress: 0 }), 1000);
     }
   };
 

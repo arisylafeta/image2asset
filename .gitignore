@@ -49,3 +49,6 @@ next-env.d.ts
 # Data files (keep structure but not files)
 /data/assets.json
 /data/jobs.json
+
+# Git worktrees
+.worktrees/

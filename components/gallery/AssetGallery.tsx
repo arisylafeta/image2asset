@@ -14,6 +14,8 @@ import {
   FileArchive
 } from 'lucide-react';
 import { AssetCard } from './AssetCard';
+import { DownloadButton } from '@/components/ui/DownloadButton';
+import { CompressionLevel } from '@/lib/utils/estimationUtils';
 
 const ModelViewer = dynamic(
   () => import('../ui/ModelViewer').then((mod) => mod.ModelViewer),
@@ -130,7 +132,7 @@ export function AssetGallery({
     }
   };
 
-  const handleObjDownload = async (asset: Asset) => {
+  const handleObjDownload = async (asset: Asset, level: CompressionLevel) => {
     setConverting(true);
     setConversionError(null);
     setConversionProgress({ stage: 'Preparing conversion...', progress: 0 });
@@ -144,7 +146,7 @@ export function AssetGallery({
       const response = await fetch('/api/convert-obj', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modelId }),
+        body: JSON.stringify({ modelId, compressionLevel: level }),
       });
 
       if (!response.ok) {
@@ -160,7 +162,7 @@ export function AssetGallery({
       try {
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${modelId.replace('.glb', '')}_obj.zip`;
+        link.download = `${modelId.replace('.glb', '')}_obj_${level}.zip`;
         document.body.appendChild(link);
         link.click();
       } finally {
@@ -184,6 +186,17 @@ export function AssetGallery({
       setConverting(false);
       setTimeout(() => setConversionProgress({ stage: '', progress: 0 }), 1000);
     }
+  };
+
+  const handleGlbDownload = async (asset: Asset, level: CompressionLevel) => {
+    // For now, GLB downloads don't support compression
+    // Just trigger the download directly
+    const link = document.createElement('a');
+    link.href = asset.path;
+    link.download = asset.path.split('/').pop() || 'model.glb';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // TODO: Add cache for converted OBJ files to avoid re-conversion
@@ -331,22 +344,18 @@ export function AssetGallery({
                 Drag to rotate · Scroll to zoom · Right-click to pan
               </p>
               <div className="flex gap-2">
-                <button
-                  onClick={() => handleObjDownload(viewingModel)}
+                <DownloadButton
+                  assetType="obj"
+                  originalSizeBytes={viewingModel.metadata.fileSize || 0}
+                  onDownload={(level) => handleObjDownload(viewingModel, level)}
                   disabled={converting}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl hover:from-orange-600 hover:to-amber-600 transition-all font-medium shadow-lg shadow-orange-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <FileArchive className="w-4 h-4" />
-                  {converting ? `Converting... ${conversionProgress.progress}%` : 'Download OBJ'}
-                </button>
-                <a
-                  href={viewingModel.path}
-                  download
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:from-emerald-600 hover:to-teal-600 transition-all font-medium shadow-lg shadow-emerald-500/25"
-                >
-                  <Download className="w-4 h-4" />
-                  Download GLB
-                </a>
+                />
+                <DownloadButton
+                  assetType="glb"
+                  originalSizeBytes={viewingModel.metadata.fileSize || 0}
+                  onDownload={(level) => handleGlbDownload(viewingModel, level)}
+                  disabled={converting}
+                />
               </div>
             </div>
           </div>

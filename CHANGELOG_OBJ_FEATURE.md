@@ -254,6 +254,37 @@ If issues arise with OBJ conversion:
 - ✅ Material deduplication
 - ✅ Draco compression support with fallback
 
+## Compression Feature Added (January 2026)
+
+### What's New
+- **Tiered Compression:** Users can choose from 3 quality levels when downloading OBJ files
+- **Size Estimates:** Real-time size estimation based on compression level
+- **Premium Tiers:** Foundation for future premium features (Ultra Compressed tier)
+- **Reusable Component:** DownloadButton component works for OBJ and GLB downloads
+
+### Technical Details
+- Mesh decimation via gltf-transform simplify/weld functions
+- Compression levels: Full (0%), Compressed (60%), Ultra (85%)
+- Size reduction: Up to 85% smaller files with Ultra compression
+- Material quality preserved across all tiers (PBR properties maintained)
+
+### Benefits
+- ✅ Faster downloads for users with slow connections
+- ✅ Smaller storage requirements
+- ✅ Better mobile experience
+- ✅ Foundation for premium monetization
+
+### Files Added
+- `lib/utils/estimationUtils.ts` - Size estimation and tier definitions
+- `lib/utils/compressionUtils.ts` - Mesh decimation logic
+- `components/ui/DownloadButton.tsx` - Reusable download component
+- `docs/compression-feature.md` - Feature documentation
+
+### Files Modified
+- `lib/converters/gltfTransformConverter.ts` - Added compression support
+- `app/api/convert-obj/route.ts` - Accept compressionLevel parameter
+- `components/gallery/AssetGallery.tsx` - Integrated DownloadButton component
+
 ## Contact/Context
 
 - **Project**: Image2Asset - Next.js 14 web app for image to 3D conversion

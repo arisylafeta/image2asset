@@ -9,8 +9,7 @@ export default function GalleryPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-5 py-2.5 border-b border-gray-800/60 bg-gray-900/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Image2Asset" className="w-7 h-7" />
-          <span className="text-base font-semibold text-white">Gallery</span>
+          <img src="/logo.png" alt="Image2Asset" className="w-15 h-7" />
         </div>
         <div className="flex items-center gap-2">
           <a

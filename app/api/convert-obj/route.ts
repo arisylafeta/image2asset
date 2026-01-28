@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { convertGLBtoOBJ } from '@/lib/converters/gltfTransformConverter';
+import { CompressionLevel, COMPRESSION_TIERS } from '@/lib/utils/estimationUtils';
 import JSZip from 'jszip';
 import * as path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
-    const { modelId } = await request.json();
+    const { modelId, compressionLevel: rawCompressionLevel = 'full' } = await request.json();
+    const compressionLevel = rawCompressionLevel as CompressionLevel;
 
     if (!modelId) {
       return NextResponse.json(
@@ -22,11 +24,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate compressionLevel
+    const validCompressionLevels: CompressionLevel[] = ['full', 'compressed', 'ultra'];
+    if (!validCompressionLevels.includes(compressionLevel)) {
+      return NextResponse.json(
+        { error: 'Invalid compressionLevel. Must be one of: full, compressed, ultra' },
+        { status: 400 }
+      );
+    }
+
+    // Check if premium is required (for future use)
+    const tier = COMPRESSION_TIERS[compressionLevel];
+    if (tier.premiumRequired) {
+      // Premium check placeholder - allow for now
+      console.log(`Premium tier requested: ${compressionLevel}`);
+    }
+
     // Resolve model path - models are stored in /public/models/
     const modelPath = path.join(process.cwd(), 'public', 'models', modelId);
 
-    // Convert GLB to OBJ with progress tracking
-    const { obj, mtl, textures } = await convertGLBtoOBJ(modelPath);
+    // Convert GLB to OBJ with progress tracking and compression level
+    const { obj, mtl, textures } = await convertGLBtoOBJ(modelPath, compressionLevel);
 
     // Create ZIP file
     const zip = new JSZip();

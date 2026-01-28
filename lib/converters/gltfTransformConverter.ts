@@ -2,6 +2,8 @@ import { Document, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import * as fs from 'fs/promises';
 import JSZip from 'jszip';
+import { CompressionLevel } from '@/lib/utils/estimationUtils';
+import { compressMesh } from '@/lib/utils/compressionUtils';
 
 export interface ConversionProgress {
   stage: string;
@@ -25,6 +27,7 @@ export interface ConversionError {
  */
 export async function convertGLBtoOBJ(
   glbPath: string,
+  compressionLevel: CompressionLevel = 'full',
   onProgress?: (progress: ConversionProgress) => void
 ): Promise<{ obj: string; mtl: string; textures: Map<string, { name: string; data: Buffer }> }> {
   onProgress?.({ stage: 'Loading GLB model', progress: 0 });
@@ -58,6 +61,20 @@ export async function convertGLBtoOBJ(
     // Parse GLB document
     const document = await io.readBinary(new Uint8Array(glbBuffer));
 
+    // Apply compression if requested
+    if (compressionLevel !== 'full') {
+      onProgress?.({ stage: 'Compressing mesh', progress: 50 });
+
+      await compressMesh(document, {
+        level: compressionLevel,
+        onProgress: (stage, prog) => {
+          // Map compression progress to overall progress (50-60%)
+          const overallProgress = 50 + (prog * 0.1);
+          onProgress?.({ stage, progress: overallProgress });
+        },
+      });
+    }
+
     onProgress?.({ stage: 'Extracting geometry and materials', progress: 60 });
 
     // Export to OBJ/MTL format
@@ -82,7 +99,7 @@ async function exportToOBJ(
   document: Document,
   onProgress?: (progress: ConversionProgress) => void
 ): Promise<ConvertedModel> {
-  onProgress?.({ stage: 'Exporting to OBJ format', progress: 65 });
+  onProgress?.({ stage: 'Exporting to OBJ format', progress: 70 });
 
   const textures = new Map<string, { name: string; data: Buffer }>();
   const materialMap = new Map<number, string>(); // material index -> name
@@ -116,7 +133,7 @@ async function exportToOBJ(
     }
   }
 
-  onProgress?.({ stage: 'Writing OBJ geometry', progress: 70 });
+  onProgress?.({ stage: 'Writing OBJ geometry', progress: 80 });
 
   // Write OBJ header
   objContent += '# OBJ file exported by gltf-transform\n';
@@ -226,7 +243,7 @@ async function exportToOBJ(
     }
   }
 
-  onProgress?.({ stage: 'OBJ export complete', progress: 85 });
+  onProgress?.({ stage: 'OBJ export complete', progress: 90 });
 
   return { obj: objContent, mtl: mtlContent, textures };
 }
